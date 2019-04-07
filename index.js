@@ -55,38 +55,54 @@ We have provided stubbed out code and tests for you below. Please note that thes
 
 
 // Your code goes here. Feel free to make helper classes if needed
-const average = arr => arr.reduce((sum, element) => sum + element, 0) / arr.length;
+class Player{
+
+  constructor(score){
+    this.scores=[score]
+  }
+
+  add_score(new_score){
+    this.scores.push(new_score)
+  }
+
+  reset(){ this.scores=[0]}
+
+  average(){
+    let scores=this.scores
+    return scores.reduce((sum, element) => sum + element, 0) / scores.length; }
+}
 
 class LeaderBoard {
 
   constructor(){
-      this.players={}; //all players object in a format {{id1: [score1,score2,...]},{id2: [score1,score2,...]}}
+      this.players={};
   }
 
-  add_score = (player_id, score) => {
-   if (score<0 || score>100) {return "invalid score"}
-   if (!Number.isInteger(player_id) || player_id<0) {return "invalid id"}
-   if (this.players[player_id]){
-      this.players[player_id].push(score)
+    add_score = (player_id, score) => {
+       if (score<0 || score>100) {return "invalid score"}
+         if (!Number.isInteger(player_id) || player_id<0) {return "invalid id"}
+        if (this.players[player_id]){
+              this.players[player_id].add_score(score)
     } else {
-     this.players={...this.players, [player_id]: [score]}
+      let player=new Player(score)
+     this.players={...this.players, [player_id]: player}
     }
 
-    return average(this.players[player_id])
+    return this.players[player_id].average()
   };
 
-  top = (num_players) => {
+  top(num_players){
     if (num_players<0 || !Number.isInteger(num_players)) { return "invalid number"}
     let topList=Object.keys(this.players).map(key=>
-      [Number(key), average(this.players[key])]).sort((a,b)=>b[1]-a[1]).map(element=>element[0]).slice(0,num_players)
+      [Number(key), this.players[key].average()]).sort((a,b)=>b[1]-a[1]).map(element=>element[0]).slice(0,num_players)
 
     return topList
 
   };
 
-  reset= (player_id) => {
+  reset(player_id){
     if (this.players[player_id]) {
-      this.players[player_id]=[0]
+      this.players[player_id].reset()
     } else{
      return "invalid id"
   }
@@ -96,18 +112,8 @@ class LeaderBoard {
 
 // Test code here
 
-function array_equals(a, b) {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (a.length != b.length) return false;
-  for (var i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
 
 var leader_board = new LeaderBoard()
-
 leader_board.add_score(1, 50)
 console.log(leader_board.add_score(2, 80) == 80)
 console.log(leader_board.add_score(2, 70) == 75)
@@ -123,4 +129,3 @@ console.log(array_equals(leader_board.top(2), [3, 2]))
 leader_board.reset(3)
 console.log('After reset top 3 [' + leader_board.top(3) + '] should equal [2, 1, 3]')
 console.log(array_equals(leader_board.top(3), [2, 1, 3]))
-console.log(leader_board.top("a"))
